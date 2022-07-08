@@ -9,6 +9,7 @@ export const auth = async (req, res, next) => {
                     return res.status(401).json({message: err.message, status: 401,});
                 } else {
                     req.decoded = decoded;
+                    console.log(decoded);
                     next();
                 }
             },);
