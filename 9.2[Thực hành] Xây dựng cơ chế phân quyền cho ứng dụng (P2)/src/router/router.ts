@@ -6,7 +6,11 @@ import { UserModel } from '../schemas/user.model';
 import { ProductModel } from '../schemas/product.model';
 import { auth } from '../middleware/auth'
 import multer from 'multer';
+import passport from "passport";
+import googleStrategy from "passport-google-oauth2";
 
+
+const GoogleStrategy = googleStrategy.Strategy
 const upload = multer();
 
 router.use("/product",upload.none(), auth)
@@ -14,6 +18,25 @@ router.use("/product",upload.none(), auth)
 router.get("/user/login",  async (req, res) => {
   res.render("login")
 })
+
+
+
+passport.use(new GoogleStrategy({
+      clientID:     GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://yourdomain:3000/auth/google/callback",
+      passReqToCallback   : true
+    },
+    function(request, accessToken, refreshToken, profile, done) {
+      User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        return done(err, user);
+      });
+    }
+));
+router.get("/user/login/google",  async (req, res) => {
+  res.render("login")
+})
+
 
 router.get("/home",  async (req, res) => {
   res.render("home")
